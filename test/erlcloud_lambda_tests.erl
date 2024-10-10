@@ -20,11 +20,15 @@ mocks() ->
      mocked_create_event_source_mapping(),
      mocked_create_function(),
      mocked_delete_event_source_mapping(),
+     mocked_delete_function(),
+     mocked_delete_function_qualifier(),
      mocked_get_alias(),
      mocked_get_event_source_mapping(),
      mocked_get_function(),
      mocked_get_function_configuration(),
      mocked_invoke(),
+     mocked_invoke_alias(),
+     mocked_invoke_qualifier(),
      mocked_list_aliases(),
      mocked_list_event_source_mappings(),
      mocked_list_function(),
@@ -87,7 +91,7 @@ mocked_create_function() ->
     }.
 mocked_delete_event_source_mapping() ->
     {
-      [?BASE_URL ++ "event-source-mappings/6554f300-551b-46a6-829c-41b6af6022c6?",
+      [?BASE_URL ++ "event-source-mappings/6554f300-551b-46a6-829c-41b6af6022c6",
        delete, '_', <<>>, '_', '_'],
       make_response(<<"{\"BatchSize\":100,\"EventSourceArn\":\"arn:aws:kinesi"
 "s:us-east-1:352283894008:stream/eholland-test\",\"FunctionArn\":\"arn:aws:lam"
@@ -96,9 +100,21 @@ mocked_delete_event_source_mapping() ->
 "ransitionReason\":\"User action\",\"UUID\":\"a45b58ec-a539-4c47-929e-174b4dd2"
 "d963\"}">>)
     }.
+mocked_delete_function() ->
+    {
+        [?BASE_URL ++ "functions/name",
+            delete, '_', <<>>, '_', '_'],
+        make_response({204,"No Content"}, <<"">>)
+    }.
+mocked_delete_function_qualifier() ->
+    {
+        [?BASE_URL ++ "functions/name_qualifier?Qualifier=123",
+            delete, '_', <<>>, '_', '_'],
+        make_response({204,"No Content"}, <<"">>)
+    }.
 mocked_get_alias() ->
         {
-      [?BASE_URL ++ "functions/name/aliases/aliasName?",
+      [?BASE_URL ++ "functions/name/aliases/aliasName",
        get, '_', <<>>, '_', '_'],
       make_response(<<"{\"AliasArn\":\"arn:aws:lambda:us-east-1:352283894008:"
 "function:name:aliasName\",\"Description\":\"\",\"FunctionVersion\":\"$LATEST\"
@@ -106,7 +122,7 @@ mocked_get_alias() ->
     }.
 mocked_get_event_source_mapping() ->
         {
-      [?BASE_URL ++ "event-source-mappings/a45b58ec-a539-4c47-929e-174b4dd2d963?",
+      [?BASE_URL ++ "event-source-mappings/a45b58ec-a539-4c47-929e-174b4dd2d963",
        get, '_', <<>>, '_', '_'],
       make_response(<<"{\"BatchSize\":100,\"EventSourceArn\":\"arn:aws:kinesi"
 "s:us-east-1:352283894008:stream/eholland-test\",\"FunctionArn\":\"arn:aws:lam"
@@ -117,7 +133,7 @@ mocked_get_event_source_mapping() ->
     }.
 mocked_get_function() ->
     {
-      [?BASE_URL ++ "functions/name?",
+      [?BASE_URL ++ "functions/name",
        get, '_', <<>>, '_', '_'],
       make_response(<<"{\"Code\":{\"Location\":\"https://awslambda-us-east-1-"
 "tasks.s3-us-east-1.amazonaws.com/snapshots/352283894008/name-69237aec-bae9-40"
@@ -142,7 +158,7 @@ mocked_get_function() ->
     }.
 mocked_get_function_configuration() ->
     {
-      [?BASE_URL ++ "functions/name/configuration?", get, '_', <<>>, '_', '_'],
+      [?BASE_URL ++ "functions/name/configuration", get, '_', <<>>, '_', '_'],
       make_response(<<"{\"CodeSha256\":\"zeoBX1hIWJBHk1muJe1iFyS1CcAmsT0Ct4Ic"
 "piPf8QM=\",\"CodeSize\":848,\"Description\":\"\",\"FunctionArn\":\"arn:aws:la"
 "mbda:us-east-1:352283894008:function:name\",\"FunctionName\":\"name\",\"Handl"
@@ -158,10 +174,24 @@ mocked_invoke() ->
     make_response(<<"{\"message\":\"Hello World!\"}">>)
   }.
 
+mocked_invoke_alias() ->
+  {
+    [?BASE_URL ++ "functions/name%3Aalias/invocations", post, '_', <<"{}">>, '_', '_'],
+    make_response(<<"{\"message\":\"Hello World!\"}">>)
+  }.
+
+
+mocked_invoke_qualifier() ->
+  {
+    [?BASE_URL ++ "functions/name_qualifier/invocations?Qualifier=123", post,
+     '_', <<"{}">>, '_', '_'],
+    make_response(<<"{\"message\":\"Hello World!\"}">>)
+  }.
+
 
 mocked_list_aliases() ->
     {
-      [?BASE_URL ++ "functions/name/aliases?", get, '_', <<>>, '_', '_'],
+      [?BASE_URL ++ "functions/name/aliases", get, '_', <<>>, '_', '_'],
       make_response(<<"{\"Aliases\":[{\"AliasArn\":\"arn:aws:lambda:us-east-1"
 ":352283894008:function:name:aliasName\",\"Description\":\"\",\"FunctionVersio"
 "n\":\"$LATEST\",\"Name\":\"aliasName\"},{\"AliasArn\":\"arn:aws:lambda:us-eas"
@@ -184,7 +214,7 @@ mocked_list_event_source_mappings() ->
 
 mocked_list_function() ->
     {
-      [?BASE_URL ++ "functions/?",
+      [?BASE_URL ++ "functions/",
        get, '_', <<>>, '_', '_'],
       make_response(<<"{\"Functions\":[{\"CodeSha256\":\"XmLDAZXEkl5KbA8ezZpw"
 "FU+bjgTXBehUmWGOScl4F2A=\",\"CodeSize\":5561,\"Description\":\"\",\"FunctionA"
@@ -265,7 +295,7 @@ mocked_list_function() ->
 
 mocked_list_versions_by_function() ->
     {
-      [?BASE_URL ++ "functions/name/versions?", get, '_', <<>>, '_', '_'],
+      [?BASE_URL ++ "functions/name/versions", get, '_', <<>>, '_', '_'],
       make_response(<<"{\"NextMarker\":null,\"Versions\":[{\"CodeSha256\":\"z"
 "eoBX1hIWJBHk1muJe1iFyS1CcAmsT0Ct4IcpiPf8QM=\",\"CodeSize\":848,\"Description"
 "\":\"\",\"FunctionArn\":\"arn:aws:lambda:us-east-1:352283894008:function:name:"
@@ -566,6 +596,18 @@ api_tests(_) ->
              ?assertEqual(Expected, Result)
      end,
      fun() ->
+             Result = erlcloud_lambda:delete_function(
+                        <<"name">>),
+             Expected = {ok, []},
+             ?assertEqual(Expected, Result)
+     end,
+     fun() ->
+             Result = erlcloud_lambda:delete_function(
+                        <<"name_qualifier">>, <<"123">>, #aws_config{}),
+             Expected = {ok, []},
+             ?assertEqual(Expected, Result)
+     end,
+     fun() ->
              Result = erlcloud_lambda:get_alias(<<"name">>, <<"aliasName">>),
              Expected = {ok, [{<<"AliasArn">>,
                                <<"arn:aws:lambda:us-east-1:352283894008:function:name:aliasName">>},
@@ -640,6 +682,16 @@ api_tests(_) ->
      fun() ->
              Result = erlcloud_lambda:invoke(<<"name">>, [], [raw_response_body], #aws_config{}),
              Expected = {ok, <<"{\"message\":\"Hello World!\"}">>},
+             ?assertEqual(Expected, Result)
+     end,
+     fun() ->
+             Result = erlcloud_lambda:invoke(<<"name:alias">>, [], [raw_response_body], #aws_config{}),
+             Expected = {ok, <<"{\"message\":\"Hello World!\"}">>},
+             ?assertEqual(Expected, Result)
+     end,
+     fun() ->
+             Result = erlcloud_lambda:invoke(<<"name_qualifier">>, [], [], <<"123">>),
+             Expected = {ok, [{<<"message">>, <<"Hello World!">>}]},
              ?assertEqual(Expected, Result)
      end,
      fun() ->
@@ -800,4 +852,7 @@ api_tests(_) ->
     ].
 
 make_response(Value) ->
-    {ok, {{200, <<"OK">>}, [], Value}}.
+    make_response({200, <<"OK">>}, Value).
+
+make_response(Status, Value) ->
+    {ok, {Status, [], Value}}.
